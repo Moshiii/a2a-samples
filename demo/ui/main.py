@@ -28,7 +28,8 @@ from pages.task_list import task_list_page
 from service.server.server import ConversationServer
 from state import host_agent_service
 from state.state import AppState
-
+from litellm import _turn_on_debug
+_turn_on_debug()
 
 load_dotenv()
 
