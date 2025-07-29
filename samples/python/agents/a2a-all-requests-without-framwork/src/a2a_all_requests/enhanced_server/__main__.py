@@ -41,10 +41,10 @@ class EnhancedA2ARequestHandler(DefaultRequestHandler):
     ):
         super().__init__(agent_executor, task_store)
 
-    async def on_get_task(self, request: GetTaskRequest) -> GetTaskResponse:
+    async def on_get_task(self, request: GetTaskRequest, context) -> GetTaskResponse:
         """Handle tasks/get requests with enhanced logging."""
         print(f"📋 GET Task Request: {request.id}")
-        return await super().on_get_task(request)
+        return await super().on_get_task(request, context)
 
     async def on_message_send(
         self, request: SendMessageRequest, context

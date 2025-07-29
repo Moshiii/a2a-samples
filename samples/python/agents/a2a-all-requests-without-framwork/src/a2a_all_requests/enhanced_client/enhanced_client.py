@@ -23,9 +23,11 @@ import httpx
 from a2a.client import A2AClient
 from a2a.types import (
     AgentCard,
+    CancelTaskRequest,
     DataPart,
     FilePart,
     FileWithBytes,
+    GetTaskRequest,
     Message,
     MessageSendParams,
     Part,
@@ -280,9 +282,15 @@ class EnhancedA2AClient:
             raise RuntimeError("A2A client not initialized")
 
         params = TaskQueryParams(id=task_id, history_length=None, metadata=None)
+        request = GetTaskRequest(
+            id=str(uuid.uuid4()),
+            jsonrpc="2.0",
+            method="tasks/get",
+            params=params
+        )
         
         try:
-            response = await self.a2a_client.get_task(params)
+            response = await self.a2a_client.get_task(request)
             print(f"✅ Task query successful")
             if hasattr(response.root, 'result'):
                 print(f"   Task ID: {response.root.result.id}")
@@ -304,9 +312,15 @@ class EnhancedA2AClient:
             raise RuntimeError("A2A client not initialized")
 
         params = TaskIdParams(id=task_id, metadata=None)
+        request = CancelTaskRequest(
+            id=str(uuid.uuid4()),
+            jsonrpc="2.0",
+            method="tasks/cancel",
+            params=params
+        )
         
         try:
-            response = await self.a2a_client.cancel_task(params)
+            response = await self.a2a_client.cancel_task(request)
             print(f"✅ Task cancellation successful")
             if hasattr(response.root, 'result'):
                 print(f"   Task ID: {response.root.result.id}")
@@ -336,7 +350,13 @@ class EnhancedA2AClient:
         print("   Testing invalid task ID...")
         try:
             params = TaskQueryParams(id="invalid-task-id", history_length=None, metadata=None)
-            await self.a2a_client.get_task(params)
+            request = GetTaskRequest(
+                id=str(uuid.uuid4()),
+                jsonrpc="2.0",
+                method="tasks/get",
+                params=params
+            )
+            await self.a2a_client.get_task(request)
         except Exception as e:
             print(f"   ✅ Expected error caught: {type(e).__name__}")
 
@@ -350,7 +370,13 @@ class EnhancedA2AClient:
                 task_id=str(uuid.uuid4()),
             )
             params = MessageSendParams(message=message)
-            await self.a2a_client.send_message(params)
+            request = SendMessageRequest(
+                id=str(uuid.uuid4()),
+                jsonrpc="2.0",
+                method="message/send",
+                params=params
+            )
+            await self.a2a_client.send_message(request)
         except Exception as e:
             print(f"   ✅ Expected error caught: {type(e).__name__}")
 
