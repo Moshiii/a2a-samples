@@ -31,6 +31,7 @@ from a2a.types import (
     Part,
     PushNotificationConfig,
     Role,
+    SendMessageRequest,
     SendStreamingMessageRequest,
     SendStreamingMessageSuccessResponse,
     TaskArtifactUpdateEvent,
@@ -88,15 +89,31 @@ class EnhancedA2AClient:
             task_id=task_id,
         )
 
-        params = MessageSendParams(message=message)
+        params = MessageSendParams(
+            message=message,
+            configuration=None,
+            metadata=None
+        )
+        
+        request = SendMessageRequest(
+            id=str(uuid.uuid4()),
+            jsonrpc="2.0",
+            method="message/send",
+            params=params
+        )
         
         try:
-            response = await self.a2a_client.send_message(params)
+            response = await self.a2a_client.send_message(request)
             print(f"✅ Synchronous response received for task {task_id}")
-            print(f"   Status: {response.status.state}")
-            if response.artifacts:
-                for artifact in response.artifacts:
-                    print(f"   Artifact: {artifact.name} - {artifact.description}")
+            if hasattr(response.root, 'result') and hasattr(response.root.result, 'status'):
+                print(f"   Status: {response.root.result.status.state}")
+                if hasattr(response.root.result, 'artifacts') and response.root.result.artifacts:
+                    for artifact in response.root.result.artifacts:
+                        print(f"   Artifact: {artifact.name} - {artifact.description}")
+            elif hasattr(response.root, 'error'):
+                print(f"   Error: {response.root.error.message}")
+            else:
+                print(f"   Response type: {type(response.root).__name__}")
             return task_id
         except Exception as e:
             print(f"❌ Error in synchronous send: {e}")
@@ -181,12 +198,28 @@ class EnhancedA2AClient:
             task_id=task_id,
         )
 
-        params = MessageSendParams(message=message)
+        params = MessageSendParams(
+            message=message,
+            configuration=None,
+            metadata=None
+        )
+        
+        request = SendMessageRequest(
+            id=str(uuid.uuid4()),
+            jsonrpc="2.0",
+            method="message/send",
+            params=params
+        )
         
         try:
-            response = await self.a2a_client.send_message(params)
+            response = await self.a2a_client.send_message(request)
             print(f"✅ File upload completed for task {task_id}")
-            print(f"   Status: {response.status.state}")
+            if hasattr(response.root, 'result') and hasattr(response.root.result, 'status'):
+                print(f"   Status: {response.root.result.status.state}")
+            elif hasattr(response.root, 'error'):
+                print(f"   Error: {response.root.error.message}")
+            else:
+                print(f"   Response type: {type(response.root).__name__}")
             return task_id
         except Exception as e:
             print(f"❌ Error in file upload: {e}")
@@ -212,12 +245,28 @@ class EnhancedA2AClient:
             task_id=task_id,
         )
 
-        params = MessageSendParams(message=message)
+        params = MessageSendParams(
+            message=message,
+            configuration=None,
+            metadata=None
+        )
+        
+        request = SendMessageRequest(
+            id=str(uuid.uuid4()),
+            jsonrpc="2.0",
+            method="message/send",
+            params=params
+        )
         
         try:
-            response = await self.a2a_client.send_message(params)
+            response = await self.a2a_client.send_message(request)
             print(f"✅ Structured data sent for task {task_id}")
-            print(f"   Status: {response.status.state}")
+            if hasattr(response.root, 'result') and hasattr(response.root.result, 'status'):
+                print(f"   Status: {response.root.result.status.state}")
+            elif hasattr(response.root, 'error'):
+                print(f"   Error: {response.root.error.message}")
+            else:
+                print(f"   Response type: {type(response.root).__name__}")
             return task_id
         except Exception as e:
             print(f"❌ Error in structured data: {e}")
@@ -230,15 +279,18 @@ class EnhancedA2AClient:
         if not self.a2a_client:
             raise RuntimeError("A2A client not initialized")
 
-        params = TaskQueryParams(id=task_id)
+        params = TaskQueryParams(id=task_id, history_length=None, metadata=None)
         
         try:
             response = await self.a2a_client.get_task(params)
             print(f"✅ Task query successful")
-            print(f"   Task ID: {response.id}")
-            print(f"   Status: {response.status.state}")
-            if response.artifacts:
-                print(f"   Artifacts: {len(response.artifacts)}")
+            if hasattr(response.root, 'result'):
+                print(f"   Task ID: {response.root.result.id}")
+                print(f"   Status: {response.root.result.status.state}")
+                if response.root.result.artifacts:
+                    print(f"   Artifacts: {len(response.root.result.artifacts)}")
+            else:
+                print(f"   Error: {response.root.error.message}")
             return response
         except Exception as e:
             print(f"❌ Error in task query: {e}")
@@ -251,13 +303,16 @@ class EnhancedA2AClient:
         if not self.a2a_client:
             raise RuntimeError("A2A client not initialized")
 
-        params = TaskIdParams(id=task_id)
+        params = TaskIdParams(id=task_id, metadata=None)
         
         try:
             response = await self.a2a_client.cancel_task(params)
             print(f"✅ Task cancellation successful")
-            print(f"   Task ID: {response.id}")
-            print(f"   Status: {response.status.state}")
+            if hasattr(response.root, 'result'):
+                print(f"   Task ID: {response.root.result.id}")
+                print(f"   Status: {response.root.result.status.state}")
+            else:
+                print(f"   Error: {response.root.error.message}")
             return response
         except Exception as e:
             print(f"❌ Error in task cancellation: {e}")
@@ -266,38 +321,9 @@ class EnhancedA2AClient:
     async def demonstrate_push_notifications(self, task_id: str, webhook_url: str):
         """Demonstrate push notification setup."""
         print(f"\n🔔 Demonstrating push notification setup for: {task_id}")
-        
-        if not self.a2a_client:
-            raise RuntimeError("A2A client not initialized")
-
-        # Set push notification config
-        push_config = PushNotificationConfig(
-            url=webhook_url,
-            token="demo-token-123",
-            authentication=None
-        )
-        
-        set_params = TaskPushNotificationConfig(
-            id=task_id,
-            push_notification=push_config
-        )
-        
-        try:
-            # Set push notification
-            response = await self.a2a_client.set_task_push_notification(set_params)
-            print(f"✅ Push notification set successfully")
-            print(f"   Webhook URL: {response.push_notification.url}")
-            
-            # Get push notification config
-            get_params = TaskIdParams(id=task_id)
-            get_response = await self.a2a_client.get_task_push_notification(get_params)
-            print(f"✅ Push notification config retrieved")
-            print(f"   Token: {get_response.push_notification.token}")
-            
-            return response
-        except Exception as e:
-            print(f"❌ Error in push notification setup: {e}")
-            return None
+        print("   ⚠️  Push notification methods not available in current A2A client version")
+        print("   This feature requires a newer version of the A2A SDK")
+        return None
 
     async def demonstrate_error_handling(self):
         """Demonstrate various error scenarios."""
@@ -309,7 +335,7 @@ class EnhancedA2AClient:
         # Test with invalid task ID
         print("   Testing invalid task ID...")
         try:
-            params = TaskQueryParams(id="invalid-task-id")
+            params = TaskQueryParams(id="invalid-task-id", history_length=None, metadata=None)
             await self.a2a_client.get_task(params)
         except Exception as e:
             print(f"   ✅ Expected error caught: {type(e).__name__}")
@@ -365,11 +391,9 @@ class EnhancedA2AClient:
         # 5. Task query demonstration
         await self.demonstrate_task_query(sync_task_id)
 
-        # 6. Push notification demonstration
-        await self.demonstrate_push_notifications(
-            sync_task_id, 
-            "https://webhook.site/demo-endpoint"
-        )
+        # 6. Push notification demonstration (not available in current client)
+        print("\n🔔 Push notification methods not available in current A2A client version")
+        print("   This feature requires a newer version of the A2A SDK")
 
         # 7. Error handling demonstration
         await self.demonstrate_error_handling()

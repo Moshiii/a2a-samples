@@ -47,7 +47,7 @@ class EnhancedA2ARequestHandler(DefaultRequestHandler):
         return await super().on_get_task(request)
 
     async def on_message_send(
-        self, request: SendMessageRequest
+        self, request: SendMessageRequest, context
     ) -> SendMessageResponse:
         """Handle message/send requests with enhanced logging."""
         print(f"📤 SEND Message Request: {request.message.message_id}")
@@ -59,7 +59,7 @@ class EnhancedA2ARequestHandler(DefaultRequestHandler):
                     print(f"   Part {i}: File content ({part.root.file.name})")
                 elif hasattr(part.root, 'data'):
                     print(f"   Part {i}: Structured data")
-        return await super().on_message_send(request)
+        return await super().on_message_send(request, context)
 
 
 @click.command()
