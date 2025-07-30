@@ -53,8 +53,32 @@ class EnhancedAgentExecutor(AgentExecutor):
             raise Exception('No message provided')
 
         if not task:
-            task = new_task(context.message)
+            print(f"🔧 Creating new task for message with task_id: {context.message.task_id}")
+            # Use the task ID from the message if it exists, otherwise create a new task
+            if context.message.task_id:
+                # Create task with the existing task ID from the message
+                task = new_task(context.message)
+                # Ensure the task ID matches the message
+                task.id = context.message.task_id
+                print(f"🔧 Created task with ID: {task.id}")
+            else:
+                task = new_task(context.message)
+                print(f"🔧 Created task with new ID: {task.id}")
+            
+            # Enqueue the task creation event
             await event_queue.enqueue_event(task)
+            print(f"🔧 Enqueued task creation event for task: {task.id}")
+            
+            # Also enqueue a status update to ensure the task is properly initialized
+            await event_queue.enqueue_event(
+                TaskStatusUpdateEvent(
+                    status=TaskStatus(state=TaskState.submitted),
+                    final=False,
+                    context_id=task.context_id,
+                    task_id=task.id,
+                )
+            )
+            print(f"🔧 Enqueued task status update for task: {task.id}")
 
         # Check for different content types in the message
         has_file_content = False

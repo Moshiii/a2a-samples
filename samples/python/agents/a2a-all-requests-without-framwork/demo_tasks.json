@@ -1,0 +1,28 @@
+{
+  "tasks": {
+    "demo-task-001": {
+      "id": "demo-task-001",
+      "context_id": "context-001",
+      "status": {
+        "state": "submitted",
+        "message": null,
+        "final": false
+      },
+      "artifacts": [],
+      "created_at": "2025-07-30T11:51:52.468693",
+      "updated_at": "2025-07-30T11:51:52.468706"
+    },
+    "demo-task-002": {
+      "id": "demo-task-002",
+      "context_id": "context-002",
+      "status": {
+        "state": "canceled",
+        "message": null,
+        "final": false
+      },
+      "artifacts": [],
+      "created_at": "2025-07-30T11:51:52.468937",
+      "updated_at": "2025-07-30T11:51:52.469519"
+    }
+  }
+}

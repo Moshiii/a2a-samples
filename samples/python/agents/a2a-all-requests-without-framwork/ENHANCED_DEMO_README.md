@@ -56,24 +56,34 @@ The **Agent2Agent (A2A) protocol** is an open standard by Google for communicati
 - ✅ **Task cancellation** - Cancel ongoing operations
 - ✅ **Push notifications** - Webhook-based updates
 
+### 💾 **Task Management System**
+- ✅ **JSON-based Task Storage** - Persistent task storage using JSON files
+- ✅ **Task Creation** - Automatic task creation from messages
+- ✅ **Task Retrieval** - Query tasks by ID with full status information
+- ✅ **Task Status Updates** - Update task states (submitted, working, completed, canceled, failed)
+- ✅ **Task Deletion** - Remove tasks from storage
+- ✅ **Task Listing** - List all stored tasks
+- ✅ **Concurrent Access** - Thread-safe operations with async locks
+
 ## 🏗️ Project Structure
 
 ```
-a2a-mcp-without-framework/
-├── src/no_llm_framework/
+a2a-all-requests-without-framwork/
+├── src/a2a_all_requests/
 │   ├── enhanced_client/
 │   │   ├── enhanced_client.py      # Comprehensive A2A client
 │   │   └── __main__.py             # Client entry point
-│   ├── enhanced_server/
-│   │   ├── enhanced_agent.py       # Enhanced agent implementation
-│   │   ├── enhanced_agent_executor.py  # Agent executor
-│   │   └── __main__.py             # Server entry point
-│   └── server/
-│       └── constant.py             # Server constants
+│   └── enhanced_server/
+│       ├── enhanced_agent.py       # Enhanced agent implementation
+│       ├── enhanced_agent_executor.py  # Agent executor
+│       ├── json_task_store.py      # JSON-based task storage system
+│       └── __main__.py             # Server entry point
 ├── run_enhanced_demo.sh            # Automated demo runner
+├── demo_task_management.py         # Task management demonstration script
 ├── .env.example                    # Environment variables template
-├── ENHANCED_DEMO_README.md         # This file
-└── ENHANCED_DEMO_README.md         # Original README
+├── pyproject.toml                  # Project configuration
+├── README.md                       # Project overview
+└── ENHANCED_DEMO_README.md         # Detailed demo documentation
 ```
 
 ## 🛠️ Setup & Installation
@@ -134,6 +144,21 @@ This script will:
 3. ✅ Wait for server to be ready
 4. ✅ Run comprehensive client demonstrations
 5. ✅ Clean up server processes
+
+### Task Management Demo
+
+You can also run a standalone task management demonstration:
+
+```bash
+python demo_task_management.py
+```
+
+This script demonstrates:
+- Task creation and storage
+- Task retrieval and status updates
+- Task deletion and listing
+- JSON file persistence
+- Concurrent access handling
 
 ### Manual Execution
 

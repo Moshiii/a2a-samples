@@ -291,14 +291,16 @@ class EnhancedA2AClient:
         
         try:
             response = await self.a2a_client.get_task(request)
-            print(f"✅ Task query successful")
             if hasattr(response.root, 'result'):
+                print(f"✅ Task query successful")
                 print(f"   Task ID: {response.root.result.id}")
                 print(f"   Status: {response.root.result.status.state}")
                 if response.root.result.artifacts:
                     print(f"   Artifacts: {len(response.root.result.artifacts)}")
+            elif hasattr(response.root, 'error'):
+                print(f"❌ Task query failed: {response.root.error.message}")
             else:
-                print(f"   Error: {response.root.error.message}")
+                print(f"❌ Unexpected response type: {type(response.root).__name__}")
             return response
         except Exception as e:
             print(f"❌ Error in task query: {e}")
@@ -321,12 +323,14 @@ class EnhancedA2AClient:
         
         try:
             response = await self.a2a_client.cancel_task(request)
-            print(f"✅ Task cancellation successful")
             if hasattr(response.root, 'result'):
+                print(f"✅ Task cancellation successful")
                 print(f"   Task ID: {response.root.result.id}")
                 print(f"   Status: {response.root.result.status.state}")
+            elif hasattr(response.root, 'error'):
+                print(f"❌ Task cancellation failed: {response.root.error.message}")
             else:
-                print(f"   Error: {response.root.error.message}")
+                print(f"❌ Unexpected response type: {type(response.root).__name__}")
             return response
         except Exception as e:
             print(f"❌ Error in task cancellation: {e}")
@@ -356,9 +360,14 @@ class EnhancedA2AClient:
                 method="tasks/get",
                 params=params
             )
-            await self.a2a_client.get_task(request)
+            response = await self.a2a_client.get_task(request)
+            # Check if response contains an error
+            if hasattr(response.root, 'error'):
+                print(f"   ✅ Expected error response: {response.root.error.message}")
+            else:
+                print(f"   ❌ Unexpected success response")
         except Exception as e:
-            print(f"   ✅ Expected error caught: {type(e).__name__}")
+            print(f"   ✅ Expected exception caught: {type(e).__name__}")
 
         # Test with invalid message
         print("   Testing invalid message...")

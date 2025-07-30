@@ -124,6 +124,6 @@ Agent can also be built using a container file.
     ```bash
     podman run -p 12000:12000 --network host a2a-ui
     ```
-
 > [!Important]  
 > Using the `host` network not recommended in production.
+
