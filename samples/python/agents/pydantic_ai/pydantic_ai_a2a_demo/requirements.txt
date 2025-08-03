@@ -1,0 +1,5 @@
+pydantic-ai-slim[a2a]
+uvicorn
+fastapi
+httpx
+python-dotenv 
