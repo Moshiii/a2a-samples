@@ -1,7 +1,6 @@
 import asyncio
 import uvicorn
 import httpx
-import json
 import uuid
 from pydantic_ai import Agent
 from dotenv import load_dotenv

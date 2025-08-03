@@ -6,7 +6,7 @@
 
 ## 项目结构
 
-```
+```bash
 pydantic_ai_a2a_demo/
 ├── server1.py          # 被动A2A服务器 (端口8000)
 ├── server2.py          # 主动A2A服务器 (端口8001)
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 ### 4. 配置环境变量
 创建 `.env` 文件并添加你的OpenAI API密钥：
-```
+```bash
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
@@ -56,46 +56,13 @@ OPENAI_API_KEY=your_openai_api_key_here
 ```bash
 python server1.py
 ```
-Server 1 将在 http://localhost:8000 启动，并等待来自Server 2的消息。
+Server 1 将在8000端口启动，并等待来自Server 2的消息。
 
 #### 启动主动服务器 (Server 2)
 ```bash
 python server2.py
 ```
-Server 2 将在 http://localhost:8001 启动，并自动向Server 1发送消息。
-
-### 方法2: 使用演示脚本
-
-创建一个简单的演示脚本：
-
-```python
-# demo.py
-import asyncio
-import subprocess
-import sys
-
-async def run_demo():
-    print("=== A2A Server Communication Demo ===")
-    
-    # 启动Server 1
-    server1 = subprocess.Popen([sys.executable, "server1.py"])
-    await asyncio.sleep(3)
-    
-    # 启动Server 2
-    server2 = subprocess.Popen([sys.executable, "server2.py"])
-    
-    # 等待完成
-    server1.wait()
-    server2.wait()
-
-if __name__ == "__main__":
-    asyncio.run(run_demo())
-```
-
-然后运行：
-```bash
-python demo.py
-```
+Server 2 将在8001端口启动，并自动向Server 1发送消息。
 
 ## 通信流程
 
